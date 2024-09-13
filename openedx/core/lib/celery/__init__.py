@@ -21,10 +21,34 @@ from celery import Celery
 
 # WARNING: Do not refer to this unless you are cms.celery or
 # lms.celery. See module docstring!
-APP = Celery('proj')
+APP = Celery('proj', broker="redis://:password@edx.devstack.redis:6379/10")
 
 APP.conf.task_protocol = 1
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
 APP.config_from_object('django.conf:settings')
 APP.autodiscover_tasks()
+
+
+import celery.signals
+
+CELERY_SIGNAL_NAMES = [
+    'before_task_publish',
+    'after_task_publish',
+    'task_prerun',
+    'task_postrun',
+    'task_retry',
+    'task_success',
+    'task_failure',
+    'task_internal_error',
+    'task_received',
+    'task_revoked',
+    'task_unknown',
+    'task_rejected',
+]
+
+def log_celery_signal(*args, **kwargs):
+    print(f"⚠️⚠️⚠️ Celery signal received: {args=} {kwargs=}")
+
+for signal_name in CELERY_SIGNAL_NAMES:
+    getattr(celery.signals, signal_name).connect(log_celery_signal, weak=False)

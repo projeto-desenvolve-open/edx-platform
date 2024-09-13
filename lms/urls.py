@@ -108,6 +108,7 @@ urlpatterns = [
     path('', include('lms.djangoapps.static_template_view.urls')),
 
     path('heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
+    path('celery_repro', include('openedx.core.djangoapps.celery_repro.urls')),
 
     path('i18n/', include('django.conf.urls.i18n')),
 
